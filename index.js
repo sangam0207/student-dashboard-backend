@@ -16,9 +16,21 @@ if (!fs.existsSync(FILE)) {
   fs.writeFileSync(FILE, "id,submittedAt,name,roll,contact,email,course,semester,SEC,VAC,GE\n");
 }
 
+
 app.post("/submit", (req, res) => {
   const data = req.body;
+  console.log("Received submission:", data);
+
   try {
+    // Normalize selections (ignore number suffix)
+    const selections = {};
+    if (data.selections) {
+      Object.entries(data.selections).forEach(([key, value]) => {
+        const baseKey = key.replace(/_\d+$/, ""); // remove "_number" part
+        selections[baseKey] = value;
+      });
+    }
+
     const row = {
       id: Date.now().toString(),
       submittedAt: new Date().toISOString(),
@@ -28,9 +40,9 @@ app.post("/submit", (req, res) => {
       email: data.email,
       course: data.course,
       semester: data.semester,
-      SEC: data.selections.SEC || "",
-      VAC: data.selections.VAC || "",
-      GE: data.selections.GE || "",
+      SEC: selections.SEC || "",
+      VAC: selections.VAC || "",
+      GE: selections.GE || "",
     };
 
     const csv = parse([row], { header: false });
@@ -41,6 +53,7 @@ app.post("/submit", (req, res) => {
     res.status(500).json({ success: false, message: e.message });
   }
 });
+
 
 app.get("/export", (req, res) => {
   res.download(FILE, "submissions.csv");
