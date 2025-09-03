@@ -50,7 +50,7 @@ app.post("/submit", (req, res) => {
 
     res.json({ success: true, message: "Submission saved." });
   } catch (e) {
-    console.error("❌ Error saving submission:", e);
+    console.error("Error saving submission:", e);
     res.status(500).json({ success: false, message: e.message });
   }
 });
@@ -59,4 +59,4 @@ app.get("/export", (req, res) => {
   res.download(FILE, "submissions.csv");
 });
 
-app.listen(5000, () => console.log("✅ Server running on 5000"));
+app.listen(5000, () => console.log("Server running on 5000"));
